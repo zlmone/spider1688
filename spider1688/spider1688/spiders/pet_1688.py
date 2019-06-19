@@ -221,16 +221,16 @@ class PetBed1688Spider(scrapy.Spider):
                 
                 self.driver.switch_to.window(self.driver.window_handles[1])
                 self.driver.get(url)
-                time.sleep(random.randint(5,7))
+                time.sleep(random.randint(5,10))
                 html = self.driver.page_source
                 detail = Selector(text=self.driver.page_source)
                 yield self.parse_store(detail)
                 yield self.parse_ped_bed(detail)
-                time.sleep(random.randint(3, 5))
+                time.sleep(random.randint(5, 10))
                 self.driver.switch_to.window(self.driver.window_handles[0])
-                time.sleep(random.randint(3,5))
+                time.sleep(random.randint(5,10))
             try:
-                time.sleep(5)
+                time.sleep(10)
                 next_page.click()
             except Exception as e:
                 print("done")
