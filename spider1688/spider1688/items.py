@@ -44,6 +44,7 @@ class PetBedItem(scrapy.Item):
     item_id = scrapy.Field()
     # 产品名称
     product_name = scrapy.Field()
+    product_store = scrapy.Field()
     # 材质
     material = scrapy.Field()
     # 产品类别

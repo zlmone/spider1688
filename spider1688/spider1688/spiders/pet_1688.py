@@ -141,7 +141,7 @@ class PetBed1688Spider(scrapy.Spider):
         size_prices = response.css('table.table-sku td.price span em.value::text').getall()
         good_images = response.css('ul.nav.fd-clr li.tab-trigger::attr(data-imgs)').getall()
         bargain_number = response.css('p.bargain-number a em.value::text').get()
-
+        pet_bed['product_store'] = response.css('div.address span.disc::text').get()
         pet_bed['product_name'] = response.css('h1.d-title::text').get()
         # 开始设值
         size_price_map = dict()

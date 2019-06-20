@@ -36,6 +36,8 @@ class MediaPipeline(object):
         )
         self.e = concurrent.futures.ThreadPoolExecutor(max_workers=6)
         socket.setdefaulttimeout(30)
+        self.ped_bed_set = set()
+        self.ped_bed_store_set = set()
 
     def auto_download(self, url, file_path):
         try:
@@ -55,6 +57,10 @@ class MediaPipeline(object):
 
     def process_item(self, item, spider):
         if item['item_id'] == 'pet_bed':
+            if item['product_name'] in self.ped_bed_set:
+                raise DropItem('Drop exist item')
+            else:
+                self.ped_bed_set.add(item['product_name'])
             root_folder = '/mnt/e/spider-download/' + spider.name +'/image/' + item['product_number'] + '/'
             pre_img_folder = root_folder + 'pre_images/'
             origin_img_folder = root_folder + 'original_images/'
@@ -79,6 +85,9 @@ class MediaPipeline(object):
             for origin_img_url in original_images:
                 img_hash = str(abs(hash(origin_img_url)) % (10**8)) + '.jpg'
                 self.auto_download(origin_img_url, origin_img_folder + img_hash) 
+        elif item['item_id'] == '1688_store':
+            if  item['company_name'] in self.ped_bed_store_set:
+                raise DropItem('store exist')
 
         return item
 
