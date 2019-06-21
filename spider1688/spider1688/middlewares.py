@@ -6,7 +6,9 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
-
+from selenium.common.exceptions import TimeoutException
+from scrapy.http import HtmlResponse
+import logging
 
 class Spider1688SpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -101,3 +103,14 @@ class Spider1688DownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+class ChromeDownloaderMiddleware(object):
+    def process_request(self, request, spider):
+        logging.info("Chromedriver is starting")
+        self.driver = spider.driver
+        
+        try:
+            self.driver.get(request.url)
+            return HtmlResponse(url=request.url, body=self.driver.page_source, request=request, encoding='utf-8', status=200)
+        except TimeoutException:
+            return HtmlResponse(url=request.url, request=request, encoding='utf-8', status=500)

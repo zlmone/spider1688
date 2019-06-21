@@ -78,6 +78,7 @@ class PetBedItem(scrapy.Item):
     cross_border = scrapy.Field()
     # 一系列图片
     product_image = scrapy.Field()
+    product_video = scrapy.Field()
     # 30天内成交量
     bargain_number = scrapy.Field()
 

@@ -21,7 +21,7 @@ class PetBed1688Spider(scrapy.Spider):
     allowed_domains = ['1688.com']
     custom_settings = {
         'MONGO_URL': 'mongodb://localhost:27017/',
-        'MONGO_DATABASE':'1688'
+        'MONGO_DATABASE':'alibaba'
     }
     i = 0
     start_urls = [
@@ -86,12 +86,23 @@ class PetBed1688Spider(scrapy.Spider):
         company = CompanyItem()
         company['item_id'] = "1688_store"
         name = response.css('div.nameArea a.name::text')
-        company['company_name'] = name.get()
-        company['run_years'] = response.css('span.year-number::text').get()
-        company['seller_name'] = response.css('div.contactSeller a.name::text').get()
-        company['busyness_mode'] = response.css('span.biz-type-model::text').get().strip()
-        company['company_address'] = response.css('div.address span.disc::text').get()
-        company['url_in1688'] = response.css('div.detail div.base-info a::attr(href)').get()
+        if name:
+            company['company_name'] = name.get()
+        run_years = response.css('span.year-number::text')
+        if run_years:
+            company['run_years'] = run_years.get()
+        seller_name = response.css('div.contactSeller a.name::text')
+        if seller_name:
+            company['seller_name'] = seller_name.get()
+        biz = response.css('span.biz-type-model::text')
+        if biz and biz.get():
+            company['busyness_mode'] = biz.get().strip()
+        company_address = response.css('div.address span.disc::text')
+        if company_address:
+            company['company_address'] = company_address.get()
+        url_in1688 = response.css('div.detail div.base-info a::attr(href)')
+        if url_in1688:
+            company['url_in1688'] = url_in1688.get()
         # 货描
         hm_higher_or_lower = response.css("div.description-show-hm[style='display: block;'] span::attr(class)").get()
         hm_value = response.css("div.description-show-hm[style='display: block;'] span::text").get()
@@ -141,8 +152,9 @@ class PetBed1688Spider(scrapy.Spider):
         size_prices = response.css('table.table-sku td.price span em.value::text').getall()
         good_images = response.css('ul.nav.fd-clr li.tab-trigger::attr(data-imgs)').getall()
         bargain_number = response.css('p.bargain-number a em.value::text').get()
-        pet_bed['product_store'] = response.css('div.address span.disc::text').get()
+        pet_bed['product_store'] = response.css('div.detail div.base-info a::attr(href)').get()
         pet_bed['product_name'] = response.css('h1.d-title::text').get()
+        pet_bed['product_video'] = response.css('video::attr(src)').get()
         # 开始设值
         size_price_map = dict()
         min_len = min(len(size_values), len(size_prices))
@@ -151,6 +163,7 @@ class PetBed1688Spider(scrapy.Spider):
         
         pet_bed['size_prices'] = size_price_map
         pet_bed['product_image'] = good_images
+
         
         if '材质' in de_features:
             material_index = de_features.index('材质')
@@ -230,7 +243,7 @@ class PetBed1688Spider(scrapy.Spider):
                 self.driver.switch_to.window(self.driver.window_handles[0])
                 time.sleep(random.randint(5,10))
             try:
-                time.sleep(10)
+                time.sleep(random.randint(5,10))
                 next_page.click()
             except Exception as e:
                 print("done")
